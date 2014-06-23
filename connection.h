@@ -6,9 +6,11 @@
 #define MAX_REQUEST_LEN 4096
 
 typedef enum {
-	CONNECTING,
 	CONNECTED,
-	CLOSING,
+	HEADER_SENDING,
+	HEADER_SENT,
+	BODY_SENDING,
+	BODY_SENT,
 	CLOSED
 } State;
 
@@ -34,6 +36,12 @@ typedef struct {
 	struct Request parsed_request;
 
 	State state;
+
+	char response_buffer[2048];
+	int response_buffer_length;
+	long response_data_sent;
+	int response_file_fd;
+	long response_file_size;
 } Connection;
 
 int

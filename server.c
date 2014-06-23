@@ -129,6 +129,7 @@ _server_handle_client_read (Server *self, int fd)
 		if (!connection_parse_request (connection))
 			_server_close_client (self, fd);
 		else {
+			printf ("SETTING TO SEND MODE\n");
 			ev.events = EPOLLOUT;
 			ev.data.fd = fd;
 			epoll_ctl (self->epfd, EPOLL_CTL_MOD, fd, &ev);
@@ -145,9 +146,9 @@ _server_handle_client_write (Server *self, int fd)
 	connection = hash_table_get (self->connections, INT_TO_POINTER (fd));
 
 	connection_send_response (connection);
-	// send (fd, "Hello world.", 13, 0);
 
-	_server_close_client (self, fd);
+	if (connection->state == BODY_SENT)
+		_server_close_client (self, fd);
 }
 
 int
